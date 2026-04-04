@@ -1,0 +1,68 @@
+# Training Configuration for Gemma 3.1B Fine-tuning
+
+# Model Configuration
+model:
+  base_model: "unsloth/gemma-3-270m-it-unsloth-bnb-4bit"
+  max_seq_length: 2048
+  load_in_4bit: true
+  load_in_8bit: false
+
+# LoRA Configuration
+lora:
+  r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  bias: "none"
+  use_gradient_checkpointing: "unsloth"
+  random_state: 42
+
+# Training Configuration
+training:
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 4
+  gradient_accumulation_steps: 2
+  warmup_steps: 100
+  num_train_epochs: 3
+  learning_rate: 0.0002
+  fp16: true
+  logging_steps: 10
+  optim: "adamw_8bit"
+  weight_decay: 0.01
+  lr_scheduler_type: "linear"
+  seed: 42
+
+# Paths
+paths:
+  output_dir: "./results/checkpoint"
+  model_save_dir: "./results/fine-tuned-model"
+  vllm_export_dir: "./results/vllm-model"
+  test_results_dir: "./results/test_results"
+
+# Evaluation
+evaluation:
+  eval_strategy: "steps"
+  eval_steps: 100
+  save_strategy: "steps"
+  save_steps: 100
+  load_best_model_at_end: true
+
+# Dataset Configuration
+dataset:
+  name: "squad"
+  split: "train"
+  train_test_split: 0.2
+
+# vLLM Configuration
+vllm:
+  dtype: "half"
+  gpu_memory_utilization: 0.9
+  tensor_parallel_size: 1
+  pipeline_parallel_size: 1
+  quantization: "disabled"  # Options: disabled, awq, gptq
+
+# Testing
+testing:
+  temperature: 0.7
+  top_p: 0.95
+  max_tokens: 256
+  num_samples: 5
